@@ -1,0 +1,92 @@
+# OpenCode 智能体辅助开发配置文件
+# 版本: 1.0.0
+# 项目: Laravel Vue3 RestAPI
+
+project:
+  name: laravel-vue-restapi
+  type: fullstack
+  framework:
+    backend: laravel 10.x
+    frontend: vue 3.4.x
+  database: sqlite
+  environment: aliyun_2c2g
+
+agent:
+  enabled: true
+  config_file: agent.md
+  auto_sync: true
+  debug_mode: false
+  
+  providers:
+    - name: local_agent
+      type: embedded
+      priority: 1
+      
+    - name: code_assistant
+      type: api
+      endpoint: http://localhost:3000
+      priority: 2
+
+features:
+  code_generation:
+    enabled: true
+    template_path: .opencode/templates
+    auto_format: true
+    
+  code_review:
+    enabled: true
+    rules_path: .opencode/rules
+    auto_fix: false
+    
+  performance_analysis:
+    enabled: true
+    thresholds:
+      memory: 256
+      response_time: 500
+      query_count: 50
+    
+  database_optimization:
+    enabled: true
+    auto_index: true
+    analyze_queries: true
+
+paths:
+  backend: ./backend
+  frontend: ./frontend
+  database: ./backend/database/sqlite
+  logs: ./storage/logs
+  cache: ./storage/cache
+
+workflows:
+  - name: initialize_project
+    steps:
+      - check_environment
+      - create_directories
+      - configure_database
+      - generate_migrations
+      
+  - name: generate_api
+    steps:
+      - create_model
+      - create_controller
+      - create_migration
+      - update_routes
+      
+  - name: optimize_performance
+    steps:
+      - analyze_memory
+      - optimize_queries
+      - configure_cache
+      - benchmark_api
+
+monitoring:
+  enabled: true
+  interval: 60
+  metrics:
+    - cpu_usage
+    - memory_usage
+    - disk_usage
+    - response_times
+  alerts:
+    slack_webhook: ""
+    email: ""

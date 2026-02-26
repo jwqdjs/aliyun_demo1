@@ -1,0 +1,87 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Models\{{modelName}};
+use App\Http\Requests\{{modelName}}Request;
+use App\Http\Resources\{{modelName}}Resource;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class {{className}}Controller extends Controller
+{
+    protected {{modelName}} $model;
+
+    public function __construct({{modelName}} $model)
+    {
+        $this->model = $model;
+    }
+
+    public function index(Request $request): JsonResponse
+    {
+        $query = $this->model->query();
+        $query->orderBy($request->get('sort_by', 'id'), $request->get('sort_order', 'desc'));
+        $perPage = $request->get('per_page', 15);
+        ${{modelVariable}} = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => {{modelName}}Resource::collection(${{modelVariable}}),
+            'meta' => [
+                'total' => ${{modelVariable}}->total(),
+                'per_page' => ${{modelVariable}}->perPage(),
+                'current_page' => ${{modelVariable}}->currentPage(),
+                'last_page' => ${{modelVariable}}->lastPage(),
+            ],
+        ]);
+    }
+
+    public function store({{modelName}}Request $request): JsonResponse
+    {
+        $validated = $request->validated();
+        ${{modelVariable}} = $this->model->create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => '{{modelName}} created successfully',
+            'data' => new {{modelName}}Resource(${{modelVariable}}),
+        ], 201);
+    }
+
+    public function show(int $id): JsonResponse
+    {
+        ${{modelVariable}} = $this->model->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => new {{modelName}}Resource(${{modelVariable}}),
+        ]);
+    }
+
+    public function update({{modelName}}Request $request, int $id): JsonResponse
+    {
+        ${{modelVariable}} = $this->model->findOrFail($id);
+        $validated = $request->validated();
+        ${{modelVariable}}->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => '{{modelName}} updated successfully',
+            'data' => new {{modelName}}Resource(${{modelVariable}}),
+        ]);
+    }
+
+    public function destroy(int $id): JsonResponse
+    {
+        ${{modelVariable}} = $this->model->findOrFail($id);
+        ${{modelVariable}}->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => '{{modelName}} deleted successfully',
+        ]);
+    }
+}

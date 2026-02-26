@@ -1,0 +1,70 @@
+# 开发规范规则
+
+php_coding_standards:
+  - id: PSR-1
+    description: 基础编码规范
+    rules:
+      - 必须使用 <?php 或 <?= 标签
+      - 文件必须使用UTF-8编码
+      - 命名空间和类必须遵循PSR-4自动加载
+      - 类名必须使用StudlyCaps命名
+      
+  - id: PSR-12
+    description: 扩展编码规范
+    rules:
+      - 代码必须使用4个空格缩进
+      - 每行不超过120个字符
+      - 必须在文件末尾添加空行
+      - 必须使用严格的类型声明
+
+laravel_specific:
+  - id: LARAVEL-001
+    name: 路由规范
+    rules:
+      - API路由必须使用api.php
+      - 必须使用资源路由
+      - 必须进行路由命名
+      
+  - id: LARAVEL-002
+    name: 控制器规范
+    rules:
+      - 控制器必须放在Http/Controllers目录
+      - 必须使用依赖注入
+      - 必须返回JSON响应
+      
+  - id: LARAVEL-003
+    name: 模型规范
+    rules:
+      - 必须定义fillable或guarded
+      - 必须定义casts
+      - 必须定义关联关系
+
+sqlite_optimization:
+  - id: SQLITE-001
+    name: 连接优化
+    rules:
+      - 启用外键约束
+      - 设置WAL模式
+      - 设置适当的缓存大小
+      
+  - id: SQLITE-002
+    name: 查询优化
+    rules:
+      - 常用字段必须创建索引
+      - 避免使用SELECT *
+      - 使用EXPLAIN分析查询
+
+vue3_standards:
+  - id: VUE-001
+    name: 组件规范
+    rules:
+      - 使用组合式API
+      - 组件名使用PascalCase
+      - 必须定义props类型
+      
+  - id: VUE-002
+    name: 性能规范
+    rules:
+      - 使用v-once处理静态内容
+      - 使用keep-alive缓存组件
+      - 路由组件懒加载

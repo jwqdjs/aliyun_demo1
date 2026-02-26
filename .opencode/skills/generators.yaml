@@ -1,0 +1,50 @@
+# 代码生成器技能配置
+
+laravel_generators:
+  - name: model_generator
+    description: 生成Eloquent模型
+    template: model.stub
+    outputs:
+      - path: app/Models/{name}.php
+      
+  - name: controller_generator
+    description: 生成API控制器
+    template: controller.stub
+    outputs:
+      - path: app/Http/Controllers/Api/V1/{name}Controller.php
+      
+  - name: migration_generator
+    description: 生成数据库迁移
+    template: migration.stub
+    outputs:
+      - path: database/migrations/{timestamp}_create_{table}_table.php
+
+vue_generators:
+  - name: component_generator
+    description: 生成Vue组件
+    template: vue-component.stub
+    outputs:
+      - path: frontend/src/components/{name}.vue
+      
+  - name: view_generator
+    description: 生成Vue视图
+    template: vue-view.stub
+    outputs:
+      - path: frontend/src/views/{name}.vue
+      
+  - name: store_generator
+    description: 生成Pinia存储
+    template: pinia-store.stub
+    outputs:
+      - path: frontend/src/stores/{name}.js
+
+api_generators:
+  - name: restful_generator
+    description: 生成RESTful API完整代码
+    components:
+      - model
+      - migration
+      - controller
+      - routes
+      - vue_store
+      - vue_views
