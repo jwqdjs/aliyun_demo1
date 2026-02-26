@@ -5,9 +5,11 @@ const backendData = ref<{ success: boolean; message: string; version: string } |
 const loading = ref(true)
 const error = ref('')
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:8000')
+    const response = await fetch(API_URL)
     backendData.value = await response.json()
   } catch (e) {
     error.value = e instanceof Error ? e.message : '连接后端失败'
