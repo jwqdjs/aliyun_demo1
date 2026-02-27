@@ -14,17 +14,11 @@
 ```bash
 cd backend
 composer install
-
-# Tests: php artisan test [--filter=TestClassName|--filter=testMethodName]
 php artisan test                           # All tests
 php artisan test --filter=TestClassName    # Single test class
 php artisan test --filter=testMethodName   # Single test method
-
-# Code style: ./vendor/bin/pint [--test]
-./vendor/bin/pint              # Fix
+./vendor/bin/pint              # Fix style
 ./vendor/bin/pint --test       # Check only
-./vendor/bin/phpstan analyse   # Static analysis
-
 php artisan optimize:clear     # Cache
 ```
 
@@ -33,7 +27,6 @@ php artisan optimize:clear     # Cache
 cd frontend
 npm install
 npm run dev        # Dev server
-npm run preview    # Preview build
 npm run build      # Production build
 npm run typecheck  # TypeScript check
 npm run lint       # Lint & fix
@@ -50,10 +43,9 @@ npm run lint       # Lint & fix
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Services\PaymentService;
 ```
 
-**Naming**: Classes `StudlyCaps`, methods/variables `camelCase`, constants `UPPER_SNAKE_CASE`, tables `snake_case` plural
+**Naming**: Classes `StudlyCaps`, methods `camelCase`, constants `UPPER_SNAKE`, tables `snake_case` plural
 
 **Type Declarations** (required): `public function getUser(int $id): ?User`
 
@@ -76,18 +68,14 @@ public function getUser(int $id): ?User
 import { ref, computed } from 'vue'
 import type { User } from '@/types'
 
-const props = defineProps<{ userId: number; showDetails?: boolean }>()
-
-const emit = defineEmits<{
-  (e: 'update', value: User): void
-  (e: 'delete', id: number): void
-}>()
+const props = defineProps<{ userId: number }>()
+const emit = defineEmits<{ (e: 'update', value: User): void }>()
 </script>
 ```
 
 **Imports Order**: Vue core → External libs → Internal modules → Components
 
-**Naming**: Components `PascalCase`, Composables `useXxx`, Stores `camelCase`, Types `PascalCase`
+**Naming**: Components `PascalCase`, Composables `useXxx`, Types `PascalCase`
 
 **Prettier**: `semi: false`, `singleQuote: true`, `printWidth: 100`
 
@@ -97,33 +85,20 @@ const emit = defineEmits<{
 
 ### Laravel
 ```php
-public function processPayment(array $data): JsonResponse
-{
-    try {
-        $payment = PaymentService::process($data);
-        return response()->json(['success' => true, 'data' => $payment]);
-    } catch (PaymentException $e) {
-        Log::error('Payment failed: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'error' => ['code' => 'PAYMENT_FAILED', 'message' => $e->getMessage()]
-        ], 422);
-    }
-}
-
-public function store(Request $request): JsonResponse
-{
-    $validated = $request->validate([
-        'email' => 'required|email',
-        'amount' => 'required|numeric|min:1',
-    ]);
+try {
+    $payment = PaymentService::process($data);
+    return response()->json(['success' => true, 'data' => $payment]);
+} catch (PaymentException $e) {
+    return response()->json([
+        'success' => false,
+        'error' => ['code' => 'PAYMENT_FAILED', 'message' => $e->getMessage()]
+    ], 422);
 }
 ```
 
 ### Vue 3
 ```typescript
 const error = ref<string | null>(null)
-
 const fetchData = async () => {
   try {
     error.value = null
@@ -145,13 +120,20 @@ const fetchData = async () => {
 ---
 
 ## Database (SQLite)
-Use eager loading, select specific columns, add indexes for foreign keys
+Use eager loading: `User::with(['posts'])->get()`, add indexes for foreign keys
 ```php
-Schema::create('orders', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('user_id')->constrained()->onDelete('cascade');
-    $table->index(['status', 'created_at']);
-});
+$table->foreignId('user_id')->constrained()->onDelete('cascade');
+$table->index(['status', 'created_at']);
+```
+
+---
+
+## Deployment (Aliyun)
+```bash
+git clone git@github.com:jwqdjs/aliyun_demo1.git /var/www/html
+cd /var/www/html
+touch database/database.sqlite
+bash deploy.sh
 ```
 
 ---
