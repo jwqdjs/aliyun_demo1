@@ -1,0 +1,24 @@
+{
+	admin off
+	auto_https off
+
+	frankenphp {
+	}
+
+	order php before file_server
+}
+
+:80 {
+	root * /var/www/html/public
+	encode zstd gzip
+
+	# Handle root path
+	@rootFiles path /
+	rewrite @rootFiles /index.php
+
+	# Handle other paths
+	@phpFiles path *.php
+	php @phpFiles
+
+	file_server
+}

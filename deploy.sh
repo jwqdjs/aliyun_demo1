@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# 阿里云部署脚本
+# 阿里云部署脚本 (FrankenPHP 直接安装版本)
 # 在项目根目录运行: bash deploy.sh
 
 set -e
 
 echo "========== 开始部署 =========="
 
-# 1. 安装后端依赖
+# 1. 安装 PHP 依赖
 echo "[1/6] 安装后端依赖..."
 cd backend
 composer install --optimize-autoloader --no-dev
@@ -26,19 +26,31 @@ echo "[4/6] 复制前端文件到后端..."
 rm -rf ../backend/public/*
 cp -r dist/* ../backend/public/
 
-# 5. 设置权限
-echo "[5/6] 设置权限..."
+# 5. 复制 Caddyfile 配置
+echo "[5/6] 复制 Caddyfile 配置..."
+cp ../Caddyfile ../backend/Caddyfile
+
+# 6. 设置权限
+echo "[6/6] 设置权限..."
 cd ../backend
 chmod -R 755 storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
-chown -R www-data:www-data .  # 根据你的 Web 服务器用户调整
 
-# 6. 清除缓存
-echo "[6/6] 清除缓存..."
+# 7. 复制环境配置
+echo "[7/7] 配置生产环境..."
+cp .env.production .env
+
+# 8. 清除缓存
+echo "[8/8] 清除缓存..."
 php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
 echo "========== 部署完成 =========="
-echo "请确保 Web 服务器配置指向: $(pwd)/public"
+echo ""
+echo "启动命令: cd backend && frankenphp run --config Caddyfile"
+echo ""
+echo "如需安装 FrankenPHP，运行:"
+echo "curl -sL https://github.com/dunglas/frankenphp/releases/download/v1.0.6/frankenphp-linux-x86_64 -o /usr/local/bin/frankenphp"
+echo "chmod +x /usr/local/bin/frankenphp"
