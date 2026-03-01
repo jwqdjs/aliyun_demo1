@@ -25,7 +25,7 @@ onMounted(async () => {
     <div v-if="loading" class="loading">加载中...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else-if="backendData" class="success">
-      <h2>后端连接成功!</h2>
+      <h2>{{ backendData.message }}</h2>
       <pre>{{ JSON.stringify(backendData, null, 2) }}</pre>
     </div>
   </div>

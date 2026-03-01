@@ -1,0 +1,13 @@
+node_modules
+vendor
+.git
+.gitignore
+.dockerignore
+Dockerfile*
+docker-compose*
+.env*
+*.md
+README*
+start.sh
+stop.sh
+deploy.sh

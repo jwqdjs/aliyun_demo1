@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return response()->json([
         'success' => true,
-        'message' => 'Hello World! Laravel 后端已成功启动!',
+        'message' => '来自吉文庆的问候',
         'version' => app()->version(),
     ]);
 });
