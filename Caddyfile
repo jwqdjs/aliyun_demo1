@@ -1,24 +1,40 @@
 {
 	admin off
-	auto_https off
-
-	frankenphp {
-	}
-
-	order php before file_server
 }
 
-:80 {
-	root * /var/www/html/public
-	encode zstd gzip
-
-	# Handle root path
-	@rootFiles path /
-	rewrite @rootFiles /index.php
-
-	# Handle other paths
-	@phpFiles path *.php
-	php @phpFiles
-
+# 后端API
+:8080 {
+	root * /var/www/html/backend/public
+	php_fastcgi 127.0.0.1:9000
 	file_server
+}
+
+# 前端 + API代理
+:80 {
+	root * /var/www/html/frontend
+	
+	# 先匹配API路径
+	@api_api path /api/*
+	handle @api_api {
+		reverse_proxy localhost:8080
+	}
+	
+	@sanctum_api path /sanctum/*
+	handle @sanctum_api {
+		reverse_proxy localhost:8080
+	}
+	
+	# 静态文件
+	@static_files {
+		file
+	}
+	handle @static_files {
+		file_server
+	}
+	
+	# SPA fallback
+	handle {
+		rewrite /index.html
+		file_server
+	}
 }
