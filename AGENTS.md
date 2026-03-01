@@ -26,10 +26,12 @@ php artisan optimize:clear     # Cache
 ```bash
 cd frontend
 npm install
-npm run dev        # Dev server
+npm run dev        # Dev server (port 5173)
 npm run build      # Production build
+npm run preview    # Preview production build
 npm run typecheck  # TypeScript check
-npm run lint       # Lint & fix
+npm run lint       # Lint & fix (oxlint + eslint)
+npm run format     # Format code with Prettier
 ```
 
 ---
@@ -39,39 +41,18 @@ npm run lint       # Lint & fix
 **Strict Types**: `<?php declare(strict_types=1);`
 
 **Imports**: Grouped by type, alphabetical
-```php
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use App\Models\User;
-```
 
 **Naming**: Classes `StudlyCaps`, methods `camelCase`, constants `UPPER_SNAKE`, tables `snake_case` plural
 
-**Type Declarations** (required): `public function getUser(int $id): ?User`
+**Type Declarations** (required)
 
-**Early Returns**:
-```php
-public function getUser(int $id): ?User
-{
-    if ($id <= 0) return null;
-    return User::find($id);
-}
-```
+**Early Returns**: Use guard clauses to avoid nesting
 
 ---
 
 ## Code Style - Vue 3 / TypeScript
 
 **Composition API with `<script setup>`**
-```typescript
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { User } from '@/types'
-
-const props = defineProps<{ userId: number }>()
-const emit = defineEmits<{ (e: 'update', value: User): void }>()
-</script>
-```
 
 **Imports Order**: Vue core → External libs → Internal modules → Components
 
@@ -120,11 +101,38 @@ const fetchData = async () => {
 ---
 
 ## Database (SQLite)
-Use eager loading: `User::with(['posts'])->get()`, add indexes for foreign keys
+
+Use eager loading: `User::with(['posts'])->get()`, add indexes for foreign keys.
+
+**Migrations**:
 ```php
+$table->id();
 $table->foreignId('user_id')->constrained()->onDelete('cascade');
+$table->string('title');
+$table->text('content');
+$table->enum('status', ['draft', 'published'])->default('draft');
+$table->timestamps();
 $table->index(['status', 'created_at']);
 ```
+
+**Models**: Define relationships, use `$fillable` or `$guarded`.
+
+---
+
+## Service Management (Supervisor)
+
+本项目使用 supervisor 管理服务。
+
+```bash
+supervisorctl status        # 查看服务状态
+supervisorctl start all    # 启动所有服务
+supervisorctl stop all     # 停止所有服务
+supervisorctl restart all  # 重启所有服务
+```
+
+**服务详情**:
+- **laravel-backend**: Laravel 后端服务，运行在 port 8000
+- **vue-frontend**: Vue 前端开发服务器，运行在 port 5173
 
 ---
 
@@ -144,3 +152,7 @@ bash deploy.sh
 3. Use dependency injection in controllers
 4. Follow PSR standards
 5. Keep functions small (single responsibility)
+6. Use `readonly` for immutable DTOs
+7. Use enum types for status/role fields
+8. Use API Resources for JSON transformation
+9. Use Form Requests for validation
